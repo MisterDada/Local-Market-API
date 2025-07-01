@@ -10,7 +10,7 @@ export const RegisterUser = async (req, res) => {
     const user = await User.create({ name, password: hashedPassword });
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
-    res.status(201).json({ user: { id: user._id, name, email }, token });
+    res.status(201).json({ user: { id: user._id, name }, token });
   } catch (error) {
     res
       .status(400)
@@ -37,7 +37,7 @@ export const LoginUser = async (req, res) => {
 
     res
       .status(200)
-      .json({ user: { id: user._id, name: user.name, email }, token });
+      .json({ user: { id: user._id, name: user.name }, token });
   } catch (error) {
     res
       .status(400)
