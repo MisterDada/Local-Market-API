@@ -22,3 +22,8 @@ export const createProduct = async (req, res) => {
     res.status(401).json({message: "Error creating product"})
   }
 };
+
+
+export const addProduct = async (req, res) => {
+    
+}
