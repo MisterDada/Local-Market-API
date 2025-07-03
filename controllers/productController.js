@@ -44,7 +44,7 @@ export const updateProduct = async (req, res) => {
   const updates = req.body;
 
   try {
-    const product = await ProductsSchema.findById(id);
+    const product = await Product.findById(id);
 
     if (!product) {
       return res.status(404).json({
@@ -53,6 +53,7 @@ export const updateProduct = async (req, res) => {
       });
     }
 
+    // Check if the user owns the product
     if (product.user.toString() !== req.user.id) {
       return res.status(403).json({
         success: false,
@@ -60,10 +61,9 @@ export const updateProduct = async (req, res) => {
       });
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, updates, {
-      new: true,
-      runValidators: true,
-    });
+    // Apply the updates (partial update)
+    Object.assign(product, updates);
+    const updatedProduct = await product.save();
 
     res.status(200).json({
       success: true,
