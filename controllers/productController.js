@@ -1,5 +1,19 @@
 import ProductsSchema from "../models/ProductsSchema.js";
 
+export const allProducts = async (req, res) => {
+  try {
+    const products = await ProductsSchema.find();
+
+    res.status(200).json({
+      data: products,
+    });
+  } catch (error) {
+    res
+      .status(400)
+      .json({ message: "Error Fetching Products, check internet connection" });
+  }
+};
+
 export const createProduct = async (req, res) => {
   try {
     const { name, description, price } = req.body;
@@ -44,7 +58,7 @@ export const updateProduct = async (req, res) => {
   const updates = req.body;
 
   try {
-    const product = await Product.findById(id);
+    const product = await ProductsSchema.findById(id);
 
     if (!product) {
       return res.status(404).json({
