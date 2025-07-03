@@ -13,4 +13,13 @@ const cartItemSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("CartItem", cartItemSchema);
+const cartSchema = new mongoose.Schema({
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    }, 
+    items: [cartItemSchema]
+})
+
+export default mongoose.model("Cart", cartSchema);
