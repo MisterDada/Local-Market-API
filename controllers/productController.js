@@ -39,4 +39,41 @@ export const deleteProduct = async (req, res) => {
   }
 };
 
+export const updateProduct = async (req, res) => {
+  const { id } = req.params;
+  const updates = req.body;
 
+  try {
+    const product = await ProductsSchema.findById(id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    if (product.user.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "You are not allowed to update this product",
+      });
+    }
+
+    const updatedProduct = await Product.findByIdAndUpdate(id, updates, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: updatedProduct,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
+  }
+};
