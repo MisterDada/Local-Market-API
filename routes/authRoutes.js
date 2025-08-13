@@ -5,7 +5,7 @@ const Router = express.Router();
 
 //Register route
 
-Router.post("/Register", RegisterUser);
+Router.post("/register", RegisterUser);
 
 //Login route
 
