@@ -1,0 +1,3 @@
+i changes Register to register.
+added email field to the user schema avoid the duplicate issue.
+changed product.user to product.seller.
