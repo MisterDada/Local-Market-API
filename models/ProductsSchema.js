@@ -14,7 +14,18 @@ const ProductSchema = new mongoose.Schema({
         ref: "User",
         required: true,
     },
+    tags: [{ type: String }],
+    searchKeywords: [{ type: String }],
+    sematicVector: [{ type: String }],
 });
+
+ProductSchema.index({
+    name: 'text',
+    description: 'text',
+    category: 'text',
+    tags: 'text',
+    searchKeywords: 'text'
+}); //just a basic text index to handle text search
 
 export default mongoose.model("Product", ProductSchema);
 
