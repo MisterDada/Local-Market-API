@@ -95,6 +95,55 @@ export const allProducts = async(req, res) => {
 
 
 
+export const getProductById = async(req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json({ message: "Product ID is required" });
+        }
+
+        const product = await ProductsSchema.findById(id)
+            .populate('seller', 'name email')
+            .select('-__v');
+
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: product
+        });
+
+    } catch (error) {
+        console.error('Error fetching product:', error);
+
+
+        if (error.name === 'CastError') {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid product ID format"
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: "Error fetching product",
+            error: error.message
+        });
+    }
+};
+
+
+
+
+
+
+
 export const createProduct = async(req, res) => {
     try {
         const { name, description, price, category, tags } = req.body;
@@ -107,25 +156,6 @@ export const createProduct = async(req, res) => {
             return res.status(400).json({ message: "Product image is required" });
         }
 
-        // Generate semantic keywords using AI
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-        const prompt = `Generate 5-8 search keywords for this product:
-        Name: ${name}
-        Description: ${description}
-        Category: ${category}
-        
-        Return only the keywords separated by commas, no explanations.`;
-
-        const result = await model.generateContent(prompt);
-        const searchKeywords = result.response.text().split(',').map(keyword => keyword.trim());
-
-
-        const uploadResult = await new Promise((resolve, reject) => {
-            const upload = cloudinary.uploader.upload_stream({ folder: "products" },
-                (err, result) => (err ? reject(err) : resolve(result))
-            );
-            bufferToStream(req.file.buffer).pipe(upload);
-        });
 
         const product = await ProductsSchema.create({
             name,
@@ -133,19 +163,122 @@ export const createProduct = async(req, res) => {
             price,
             category,
             tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
-            searchKeywords,
-            seller: req.user._id,
+            searchKeywords: [],
             image: {
-                url: uploadResult.secure_url,
-                public_id: uploadResult.public_id,
+                url: '',
+                public_id: '',
             },
+            imageStatus: 'pending',
+            keywordStatus: 'pending',
+            seller: req.user._id,
         });
 
-        res.status(201).json(product);
+
+        res.status(201).json({
+            success: true,
+            message: "Product created successfully",
+            data: product,
+            note: "Image upload and search keywords are being processed in the background"
+        });
+
+
+        processProductInBackground(product._id, req.file.buffer, name, description, category);
+
     } catch (error) {
         res.status(401).json({ message: "Error creating product", error: error.message });
     }
 };
+
+
+const processProductInBackground = async(productId, imageBuffer, name, description, category) => {
+    try {
+        console.log(`Starting background processing for product: ${productId}`);
+
+
+        await ProductsSchema.findByIdAndUpdate(productId, {
+            imageStatus: 'processing',
+            keywordStatus: 'processing'
+        });
+
+
+        const [imageResult, keywordResult] = await Promise.allSettled([
+            uploadImageToCloudinary(imageBuffer),
+            generateSearchKeywords(name, description, category)
+        ]);
+
+
+        if (imageResult.status === 'fulfilled') {
+            await ProductsSchema.findByIdAndUpdate(productId, {
+                image: {
+                    url: imageResult.value.secure_url,
+                    public_id: imageResult.value.public_id,
+                },
+                imageStatus: 'completed',
+                imageUploadedAt: new Date()
+            });
+            console.log(`Successfully uploaded image for product ${productId}`);
+        } else {
+            console.error(`Image upload failed for product ${productId}:`, imageResult.reason);
+            await ProductsSchema.findByIdAndUpdate(productId, {
+                imageStatus: 'failed',
+                imageError: imageResult.reason.message
+            });
+        }
+
+
+        if (keywordResult.status === 'fulfilled') {
+            await ProductsSchema.findByIdAndUpdate(productId, {
+                searchKeywords: keywordResult.value,
+                keywordStatus: 'completed',
+                keywordsGeneratedAt: new Date()
+            });
+            console.log(`Successfully generated keywords for product ${productId}`);
+        } else {
+            console.error(`Keyword generation failed for product ${productId}:`, keywordResult.reason);
+            await ProductsSchema.findByIdAndUpdate(productId, {
+                keywordStatus: 'failed',
+                keywordGenerationError: keywordResult.reason.message
+            });
+        }
+
+        console.log(`Background processing completed for product ${productId}`);
+
+    } catch (error) {
+        console.error(`Error in background processing for product ${productId}:`, error);
+
+
+        await ProductsSchema.findByIdAndUpdate(productId, {
+            imageStatus: 'failed',
+            keywordStatus: 'failed',
+            backgroundProcessingError: error.message
+        });
+    }
+};
+
+//cloudinary uploadf
+const uploadImageToCloudinary = async(imageBuffer) => {
+    return new Promise((resolve, reject) => {
+        const upload = cloudinary.uploader.upload_stream({ folder: "products" },
+            (err, result) => (err ? reject(err) : resolve(result))
+        );
+        bufferToStream(imageBuffer).pipe(upload);
+    });
+};
+//keyword generation
+const generateSearchKeywords = async(name, description, category) => {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const prompt = `Generate 5-8 search keywords for this product:
+    Name: ${name}
+    Description: ${description}
+    Category: ${category}
+    
+    Return only the keywords separated by commas, no explanations.`;
+
+    const result = await model.generateContent(prompt);
+    return result.response.text().split(',').map(keyword => keyword.trim());
+};
+
+
 
 
 

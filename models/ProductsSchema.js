@@ -6,8 +6,8 @@ const ProductSchema = new mongoose.Schema({
     price: { type: String, required: true },
     category: { type: String, required: true },
     image: {
-        url: { type: String, required: true },
-        public_id: { type: String, required: true }
+        url: { type: String, required: false }, //when the controller runs it is initialized to null to improve performance.
+        public_id: { type: String, required: false }
     },
     seller: {
         type: mongoose.Schema.Types.ObjectId,
