@@ -7,5 +7,10 @@ to implement the search feature well have to use fuzzy search or cosine similait
 use gemini embeddings api or a cosine simalairty oackge.
 then handle it later in a dedicated service folder so the controller is cleaner
 
-
+15/08/25
 Made the request faster by handing cloudinary upload and gemini api call in the background 
+16/08/25
+fixed middlware to include id field
+Completed the cart feature
+
+
