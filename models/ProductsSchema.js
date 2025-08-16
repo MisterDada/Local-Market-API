@@ -6,15 +6,26 @@ const ProductSchema = new mongoose.Schema({
     price: { type: String, required: true },
     category: { type: String, required: true },
     image: {
-        url: { type: String, required: true },
-        public_id: { type: String, required: true }
+        url: { type: String, required: false }, //when the controller runs it is initialized to null to improve performance.
+        public_id: { type: String, required: false }
     },
     seller: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
         required: true,
     },
+    tags: [{ type: String }],
+    searchKeywords: [{ type: String }],
+    sematicVector: [{ type: String }],
 });
+
+ProductSchema.index({
+    name: 'text',
+    description: 'text',
+    category: 'text',
+    tags: 'text',
+    searchKeywords: 'text'
+}); //just a basic text index to handle text search
 
 export default mongoose.model("Product", ProductSchema);
 
