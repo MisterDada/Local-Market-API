@@ -2,6 +2,11 @@ import ProductsSchema from "../models/ProductsSchema.js";
 import cloudinary from "../config/cloudinary.js";
 import { Readable } from "stream";
 
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { productResource } from "../resources/productResource.js";
+
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+
 const bufferToStream = (buffer) => {
   const readable = new Readable();
   readable._read = () => {};
@@ -94,10 +99,51 @@ export const allProducts = async (req, res) => {
       .json({ message: "Error Fetching Products, check internet connection" });
   }
 };
-//add validators later
+
+export const getProductById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ message: "Product ID is required" });
+    }
+
+    const product = await ProductsSchema.findById(id)
+      .populate("seller", "name email")
+      .select("-__v");
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: product,
+    });
+  } catch (error) {
+    console.error("Error fetching product:", error);
+
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product ID format",
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Error fetching product",
+      error: error.message,
+    });
+  }
+};
+
 export const createProduct = async (req, res) => {
   try {
-    const { name, description, price, category } = req.body;
+    const { name, description, price, category, tags } = req.body;
 
     if (!name || !price || !description || !category) {
       return res
@@ -109,28 +155,36 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ message: "Product image is required" });
     }
 
-    // Uwe handle the cloudinary stuff from here
-    const uploadResult = await new Promise((resolve, reject) => {
-      const upload = cloudinary.uploader.upload_stream(
-        { folder: "products" },
-        (err, result) => (err ? reject(err) : resolve(result))
-      );
-      bufferToStream(req.file.buffer).pipe(upload);
-    });
-
     const product = await ProductsSchema.create({
       name,
       description,
       price,
       category,
-      seller: req.user._id,
+      tags: tags ? tags.split(",").map((tag) => tag.trim()) : [],
+      searchKeywords: [],
       image: {
-        url: uploadResult.secure_url,
-        public_id: uploadResult.public_id,
+        url: "",
+        public_id: "",
       },
+      imageStatus: "pending",
+      keywordStatus: "pending",
+      seller: req.user._id,
     });
 
-    res.status(201).json(product);
+    res.status(201).json({
+      success: true,
+      message: "Product created successfully",
+      data: product,
+      note: "Image upload and search keywords are being processed in the background",
+    });
+
+    processProductInBackground(
+      product._id,
+      req.file.buffer,
+      name,
+      description,
+      category
+    );
   } catch (error) {
     res
       .status(401)
