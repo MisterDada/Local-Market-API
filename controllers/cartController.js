@@ -1,6 +1,6 @@
 import Cart from "../models/CartItemsSchema.js";
 import ProductsSchema from "../models/ProductsSchema.js";
-
+import { CartResource } from "../resources/cartResources.js";
 
 export const addToCart = async(req, res) => {
     try {
@@ -68,6 +68,48 @@ export const addToCart = async(req, res) => {
 };
 
 
+// export const getCart = async(req, res) => {
+//     try {
+//         const userId = req.user._id;
+
+//         const cart = await Cart.findOne({ user: userId })
+//             .populate('items.product', 'name price image category description');
+
+//         if (!cart) {
+//             return res.status(200).json({
+//                 success: true,
+//                 data: { items: [], total: 0, itemCount: 0 },
+//                 message: "Cart is empty"
+//             });
+//         }
+
+//         // Calculate total price
+//         const total = cart.items.reduce((sum, item) => {
+//             return sum + (item.product.price * item.quantity);
+//         }, 0);
+
+//         const itemCount = cart.items.reduce((sum, item) => sum + item.quantity, 0);
+
+//         res.status(200).json({
+//             success: true,
+//             data: {
+//                 items: cart.items,
+//                 total: total.toFixed(2),
+//                 itemCount: itemCount
+//             }
+//         });
+
+//     } catch (error) {
+//         console.error('Get cart error:', error);
+//         res.status(500).json({
+//             success: false,
+//             message: "Could not fetch cart",
+//             error: error.message
+//         });
+//     }
+// };
+
+
 export const getCart = async(req, res) => {
     try {
         const userId = req.user._id;
@@ -83,7 +125,6 @@ export const getCart = async(req, res) => {
             });
         }
 
-        // Calculate total price
         const total = cart.items.reduce((sum, item) => {
             return sum + (item.product.price * item.quantity);
         }, 0);
@@ -92,11 +133,7 @@ export const getCart = async(req, res) => {
 
         res.status(200).json({
             success: true,
-            data: {
-                items: cart.items,
-                total: total.toFixed(2),
-                itemCount: itemCount
-            }
+            data: CartResource(cart, total, itemCount)
         });
 
     } catch (error) {
