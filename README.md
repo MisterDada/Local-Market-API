@@ -75,8 +75,7 @@ All cart routes require authentication: `Authorization: Bearer <JWT>`
 - GET `/`
   - Get the authenticated user's cart with populated product details and totals.
 
-- GET `/summary`
-  - Get a lightweight summary of the cart: item count and total.
+
 
 - PATCH `/update/:productId`
   - Set a new quantity for a specific product in the cart.
