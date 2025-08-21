@@ -1,6 +1,7 @@
 import Cart from "../models/CartItemsSchema.js";
 import ProductsSchema from "../models/ProductsSchema.js";
 import { CartResource } from "../resources/cartResources.js";
+import newCart from "../models/newCartSchema.js";
 
 export const addToCart = async(req, res) => {
     try {
@@ -66,6 +67,8 @@ export const addToCart = async(req, res) => {
         });
     }
 };
+
+
 
 
 // export const getCart = async(req, res) => {
