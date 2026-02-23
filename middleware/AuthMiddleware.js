@@ -1,33 +1,48 @@
 import jwt from "jsonwebtoken";
-import User from '../models/UserSchema.js'
+import User from "../models/UserSchema.js";
 
-const VerifyToken = async(req, res, next) => {
-    let token;
-    let authheaders = req.headers.authorization || req.headers.Authorization;
+/**
+ * Verify the JWT from the Authorization header and attach
+ * the authenticated user to req.user.
+ */
+const verifyToken = async (req, res, next) => {
+    const authHeader = req.headers.authorization || req.headers.Authorization;
 
-    if (authheaders && authheaders.startsWith("Bearer")) {
-        token = authheaders.split(" ")[1];
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({
+            success: false,
+            message: "Authorization required. Please provide a Bearer token.",
+        });
+    }
 
-        if (!token) {
-            return res
-                .status(400)
-                .json({
-                    message: "Access denied, You are not permitted to perform this action",
-                });
+    const token = authHeader.split(" ")[1];
+
+    if (!token) {
+        return res.status(401).json({
+            success: false,
+            message: "Access denied. Token is missing.",
+        });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = await User.findById(decoded.id).select("_id name email role");
+
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: "User belonging to this token no longer exists.",
+            });
         }
 
-        try {
-            const decode = jwt.verify(token, process.env.JWT_SECRET);
-            req.user = await User.findById(decode.id).select("_id name email role");
-            console.log(decode);
-            next();
-        } catch (error) {
-            return res.status(400).json({ message: "error verifying token", error });
-            console.error(error);
-        }
-    } else {
-        return res.status(400).json({ message: "Authorization missing" });
+        next();
+    } catch (error) {
+        console.error("Token verification error:", error.message);
+        return res.status(401).json({
+            success: false,
+            message: "Invalid or expired token.",
+        });
     }
 };
 
-export default VerifyToken;
+export default verifyToken;

@@ -1,20 +1,28 @@
 import express from "express";
-// import { addToCart, getCart, updateCartItem, removeFromCart, clearCart } from "../controllers/cartController.js";
-import { addToCartNew, getUserCart, removeCartItem, clearUserCart } from "../controllers/newCartController.js";
+import {
+    addToCart,
+    getCart,
+    updateCartItem,
+    removeFromCart,
+    clearCart,
+} from "../controllers/cartController.js";
 import VerifyToken from "../middleware/AuthMiddleware.js";
+import validate from "../middleware/validate.js";
+import {
+    addToCartSchema,
+    updateCartItemSchema,
+    cartItemIdParamSchema,
+} from "../validations/cartValidation.js";
+
 const router = express.Router();
 
-// router.post('/add', VerifyToken, addToCart);
-// router.get('/', VerifyToken, getCart);
-// router.patch("/update/:productId", VerifyToken, updateCartItem);
-// router.delete("/remove/:productId", VerifyToken, removeFromCart);
-// router.delete("/clear", VerifyToken, clearCart);
+// All cart routes require authentication
+router.use(VerifyToken);
 
-router.post("/new/add", VerifyToken, addToCartNew);
-router.get("/new", VerifyToken, getUserCart);
-router.delete("/new/clear", VerifyToken, clearUserCart);
-router.delete("/new/:cartItemId", VerifyToken, removeCartItem);
-
-
+router.post("/add", validate(addToCartSchema), addToCart);
+router.get("/", getCart);
+router.patch("/update/:productId", validate(cartItemIdParamSchema, "params"), validate(updateCartItemSchema), updateCartItem);
+router.delete("/remove/:productId", validate(cartItemIdParamSchema, "params"), removeFromCart);
+router.delete("/clear", clearCart);
 
 export default router;

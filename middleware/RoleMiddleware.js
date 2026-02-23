@@ -1,13 +1,23 @@
+/**
+ * Role-based access control middleware.
+ * Usage: onlyAllow("Seller") or onlyAllow("Seller", "Admin")
+ */
 const onlyAllow = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user) {
-      res.status(400).json({ message: "Please, Login" });
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required. Please log in.",
+      });
     }
 
     if (!allowedRoles.includes(req.user.role)) {
-      console.log(req.user);
-      return res.status(400).json({ message: "You are not authorized" });
+      return res.status(403).json({
+        success: false,
+        message: `Access denied. Required role: ${allowedRoles.join(" or ")}`,
+      });
     }
+
     next();
   };
 };

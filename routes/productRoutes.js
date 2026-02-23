@@ -1,34 +1,56 @@
-import { allProducts, createProduct, deleteProduct, updateProduct, getProductById } from "../controllers/productController.js";
+import {
+    allProducts,
+    createProduct,
+    deleteProduct,
+    updateProduct,
+    getProductById,
+    semanticSearch,
+} from "../controllers/productController.js";
 import VerifyToken from "../middleware/AuthMiddleware.js";
-import onlyAllow from '../middleware/RoleMiddleware.js';
+import onlyAllow from "../middleware/RoleMiddleware.js";
+import validate from "../middleware/validate.js";
 import { uploadSingleImage } from "../middleware/upload.js";
+import {
+    createProductSchema,
+    updateProductSchema,
+    searchQuerySchema,
+    idParamSchema,
+} from "../validations/productValidation.js";
 import express from "express";
-import { semanticSearch } from "../controllers/productController.js";
 
 const router = express.Router();
 
-//Home page
-router.get("/allProducts", allProducts)
+// ── Public routes ──────────────────────────────────────────
+router.get("/allProducts", allProducts);
+router.get("/search", validate(searchQuerySchema, "query"), semanticSearch);
+router.get("/getByID/:id", validate(idParamSchema, "params"), getProductById);
+router.get("/:id", validate(idParamSchema, "params"), getProductById);
 
-//search page
-router.get("/search", semanticSearch)
+// ── Protected routes (Seller only) ────────────────────────
+router.post(
+    "/createProduct",
+    VerifyToken,
+    onlyAllow("Seller"),
+    uploadSingleImage,
+    validate(createProductSchema),
+    createProduct
+);
 
-//get product by ID
-router.get("/getByID/:id", getProductById);
+router.delete(
+    "/deleteProduct/:id",
+    VerifyToken,
+    onlyAllow("Seller"),
+    validate(idParamSchema, "params"),
+    deleteProduct
+);
 
-//product details page
-router.get("/:id", allProducts)
+router.patch(
+    "/updateProduct/:id",
+    VerifyToken,
+    onlyAllow("Seller"),
+    uploadSingleImage,
+    validate(updateProductSchema),
+    updateProduct
+);
 
-
-
-//Create Product Page
-router.post("/createProduct", VerifyToken, onlyAllow("Seller"), uploadSingleImage, createProduct); //remeber to add the upload middleware
-
-//Delete Product Button
-router.delete("/deleteProduct/:id", VerifyToken, onlyAllow("Seller"), deleteProduct)
-
-//Update Product
-router.patch("/updateProduct/:id", VerifyToken, onlyAllow("Seller"), uploadSingleImage, updateProduct)
-
-
-export default router
+export default router;

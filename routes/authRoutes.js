@@ -1,14 +1,11 @@
 import { RegisterUser, LoginUser } from "../controllers/authController.js";
+import { registerSchema, loginSchema } from "../validations/authValidation.js";
+import validate from "../middleware/validate.js";
 import express from "express";
 
-const Router = express.Router();
+const router = express.Router();
 
-//Register route
+router.post("/register", validate(registerSchema), RegisterUser);
+router.post("/login", validate(loginSchema), LoginUser);
 
-Router.post("/register", RegisterUser);
-
-//Login route
-
-Router.post("/login", LoginUser);
-
-export default Router;
+export default router;
