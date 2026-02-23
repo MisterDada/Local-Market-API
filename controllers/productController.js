@@ -31,7 +31,7 @@ export const semanticSearch = async (req, res) => {
       .limit(limit);
 
     //generatic like terms with ai
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }); //ysing the same model as the one used in the create product function
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" }); //ysing the same model as the one used in the create product function
     const prompt = `Given this search query: "${query}", generate 10-15 related search terms, synonyms, and categories that would help find relevant products. 
         Focus on:
         - Product categories
@@ -278,7 +278,7 @@ const uploadImageToCloudinary = async (imageBuffer) => {
 };
 //keyword generation
 const generateSearchKeywords = async (name, description, category) => {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
   const prompt = `Generate 5-8 search keywords for this product:
     Name: ${name}
     Description: ${description}
