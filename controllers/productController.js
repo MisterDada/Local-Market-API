@@ -162,7 +162,7 @@ const processProductInBackground = async (productId, imageBuffer, name, descript
   }
 };
 
-// ─── Delete Product 
+//  ─ Delete Product 
 export const deleteProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -179,7 +179,7 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   return successResponse(res, deletedProduct, "Product deleted successfully");
 });
 
-// ─── Update Product 
+//  ─ Update Product 
 export const updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const updates = req.body;

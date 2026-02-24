@@ -3,7 +3,7 @@ import request from "supertest";
 import app from "../../app.js";
 
 describe("Auth Endpoints", () => {
-    // ── Registration ──────────────────────────────────────────────
+    // Registration 
 
     describe("POST /api/auth/register", () => {
         it("should register a new user and return a token", async () => {
@@ -87,7 +87,7 @@ describe("Auth Endpoints", () => {
         });
     });
 
-    // ── Login ─────────────────────────────────────────────────────
+    // Login 
 
     describe("POST /api/auth/login", () => {
         const credentials = {

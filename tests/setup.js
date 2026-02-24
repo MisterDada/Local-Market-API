@@ -4,7 +4,7 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 
 let mongoServer;
 
-// ── Stub environment variables before app loads 
+//   dummy environment variables before app loads 
 process.env.JWT_SECRET = "test-jwt-secret-key";
 process.env.NODE_ENV = "test";
 process.env.GOOGLE_API_KEY = "test-google-key";
@@ -12,7 +12,7 @@ process.env.CLOUDINARY_CLOUD_NAME = "test-cloud";
 process.env.CLOUDINARY_API_KEY = "test-key";
 process.env.CLOUDINARY_API_SECRET = "test-secret";
 
-// ── Mock external services 
+//   Mock external services 
 
 // Cloudinary – prevent real uploads
 vi.mock("../services/cloudinaryService.js", () => ({
@@ -33,7 +33,7 @@ vi.mock("../services/aiService.js", () => ({
     ]),
 }));
 
-// ── Database lifecycle 
+//   Database lifecycle 
 
 beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();

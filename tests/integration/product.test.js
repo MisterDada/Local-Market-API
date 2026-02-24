@@ -4,7 +4,7 @@ import app from "../../app.js";
 import { createSeller, createBuyer, createProduct } from "../helpers.js";
 
 describe("Product Endpoints", () => {
-    // ── Get All Products ──────────────────────────────────────────
+    // Get All Products 
 
     describe("GET /api/products/allProducts", () => {
         it("should return an empty array when no products exist", async () => {
@@ -27,7 +27,7 @@ describe("Product Endpoints", () => {
         });
     });
 
-    // ── Get Product By ID ─────────────────────────────────────────
+    // Get Product By ID 
 
     describe("GET /api/products/:id", () => {
         it("should return a product by ID", async () => {
@@ -57,7 +57,7 @@ describe("Product Endpoints", () => {
         });
     });
 
-    // ── Create Product ────────────────────────────────────────────
+    // Create Product 
 
     describe("POST /api/products/createProduct", () => {
         it("should create a product as a Seller", async () => {
@@ -116,7 +116,7 @@ describe("Product Endpoints", () => {
         });
     });
 
-    // ── Update Product ────────────────────────────────────────────
+    // Update Product 
 
     describe("PATCH /api/products/updateProduct/:id", () => {
         it("should update a product by its owner", async () => {
@@ -147,7 +147,7 @@ describe("Product Endpoints", () => {
         });
     });
 
-    // ── Delete Product ────────────────────────────────────────────
+    // Delete Product 
 
     describe("DELETE /api/products/deleteProduct/:id", () => {
         it("should delete a product", async () => {

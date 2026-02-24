@@ -7,7 +7,7 @@ describe("Cart Endpoints", () => {
     let buyerToken;
     let productId;
 
-    // ── Setup: create a seller, a product, and a buyer ─────────
+    //  Setup: create a seller, a product, and a buyer 
 
     const setupCartData = async () => {
         const seller = await createSeller();
@@ -16,7 +16,7 @@ describe("Cart Endpoints", () => {
         return { productId: product._id, buyerToken: buyer.token };
     };
 
-    // ── Add To Cart ───────────────────────────────────────────────
+    //  Add To Cart 
 
     describe("POST /api/cart/add", () => {
         it("should add an item to the cart", async () => {
@@ -55,7 +55,7 @@ describe("Cart Endpoints", () => {
 
         it("should return 404 for non-existent product", async () => {
             const buyer = await createBuyer();
-            const fakeId = "aaaaaaaaaaaaaaaaaaaaaaaa";
+            const fakeId = "dadaisaboy";
 
             const res = await request(app)
                 .post("/api/cart/add")
@@ -68,13 +68,13 @@ describe("Cart Endpoints", () => {
         it("should return 401 without authentication", async () => {
             const res = await request(app)
                 .post("/api/cart/add")
-                .send({ productId: "aaaaaaaaaaaaaaaaaaaaaaaa", quantity: 1 });
+                .send({ productId: "dadaisaboy", quantity: 1 });
 
             expect(res.status).toBe(401);
         });
     });
 
-    // ── Get Cart ──────────────────────────────────────────────────
+    //  Get Cart 
 
     describe("GET /api/cart", () => {
         it("should return an empty cart for a new user", async () => {
@@ -108,7 +108,7 @@ describe("Cart Endpoints", () => {
         });
     });
 
-    // ── Update Cart Item ──────────────────────────────────────────
+    //  Update Cart Item 
 
     describe("PATCH /api/cart/update/:productId", () => {
         it("should update item quantity", async () => {
@@ -129,7 +129,7 @@ describe("Cart Endpoints", () => {
 
         it("should return 404 for item not in cart", async () => {
             const buyer = await createBuyer();
-            const fakeId = "aaaaaaaaaaaaaaaaaaaaaaaa";
+            const fakeId = "dadaisaboy";
 
             // Create an empty cart first by adding then removing, or just try to update
             const res = await request(app)
@@ -141,7 +141,7 @@ describe("Cart Endpoints", () => {
         });
     });
 
-    // ── Remove From Cart ──────────────────────────────────────────
+    //  Remove From Cart 
 
     describe("DELETE /api/cart/remove/:productId", () => {
         it("should remove an item from the cart", async () => {
@@ -160,7 +160,7 @@ describe("Cart Endpoints", () => {
         });
     });
 
-    // ── Clear Cart ────────────────────────────────────────────────
+    //  Clear Cart 
 
     describe("DELETE /api/cart/clear", () => {
         it("should clear all items from the cart", async () => {

@@ -18,7 +18,7 @@ const errorHandler = (err, _req, res, _next) => {
     let message = err.message || "Internal server error";
     let status = err.status || "error";
 
-    // ── Mongoose validation error 
+    //   Mongoose validation error 
     if (err.name === "ValidationError") {
         statusCode = 400;
         status = "fail";
@@ -26,14 +26,14 @@ const errorHandler = (err, _req, res, _next) => {
         message = messages.join(". ");
     }
 
-    // ── Mongoose bad ObjectId 
+    //   Mongoose bad ObjectId 
     if (err.name === "CastError") {
         statusCode = 400;
         status = "fail";
         message = `Invalid ${err.path}: ${err.value}`;
     }
 
-    // ── Mongoose duplicate key 
+    //   Mongoose duplicate key 
     if (err.code === 11000) {
         statusCode = 409;
         status = "fail";
@@ -41,7 +41,7 @@ const errorHandler = (err, _req, res, _next) => {
         message = `Duplicate value for: ${field}`;
     }
 
-    // ── JWT errors 
+    //   JWT errors 
     if (err.name === "JsonWebTokenError") {
         statusCode = 401;
         status = "fail";
@@ -53,7 +53,7 @@ const errorHandler = (err, _req, res, _next) => {
         message = "Token expired. Please log in again.";
     }
 
-    // ── Multer errors 
+    //   Multer errors 
     if (err.name === "MulterError") {
         statusCode = 400;
         status = "fail";

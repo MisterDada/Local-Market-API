@@ -5,7 +5,7 @@ import AppError from "../utils/AppError.js";
 import { successResponse } from "../utils/apiResponse.js";
 import { CartResource } from "../resources/cartResources.js";
 
-// ─── Add To Cart ───────────────────────────────────────────
+//  ─ Add To Cart                      ─
 /**
  * POST /api/cart/add
  */
@@ -48,7 +48,7 @@ export const addToCart = asyncHandler(async (req, res) => {
     return successResponse(res, cart, "Item added to cart successfully");
 });
 
-// ─── Get Cart ──────────────────────────────────────────────
+//  ─ Get Cart                        
 /**
  * GET /api/cart
  */
@@ -73,7 +73,7 @@ export const getCart = asyncHandler(async (req, res) => {
     return successResponse(res, CartResource(cart, total, itemCount));
 });
 
-// ─── Update Cart Item ──────────────────────────────────────
+//  ─ Update Cart Item                    
 /**
  * PATCH /api/cart/update/:productId
  */
@@ -103,7 +103,7 @@ export const updateCartItem = asyncHandler(async (req, res) => {
     return successResponse(res, cart, "Cart item updated successfully");
 });
 
-// ─── Remove From Cart ──────────────────────────────────────
+//  ─ Remove From Cart                    
 /**
  * DELETE /api/cart/remove/:productId
  */
@@ -130,7 +130,7 @@ export const removeFromCart = asyncHandler(async (req, res) => {
     return successResponse(res, cart, "Item removed from cart successfully");
 });
 
-// ─── Clear Cart ────────────────────────────────────────────
+//  ─ Clear Cart                       
 /**
  * DELETE /api/cart/clear
  */
