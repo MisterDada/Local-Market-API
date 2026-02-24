@@ -20,13 +20,13 @@ import express from "express";
 
 const router = express.Router();
 
-// ── Public routes ──────────────────────────────────────────
+// Public routes 
 router.get("/allProducts", allProducts);
 router.get("/search", validate(searchQuerySchema, "query"), semanticSearch);
 router.get("/getByID/:id", validate(idParamSchema, "params"), getProductById);
 router.get("/:id", validate(idParamSchema, "params"), getProductById);
 
-// ── Protected routes (Seller only) ────────────────────────
+// Seller only rotes
 router.post(
     "/createProduct",
     VerifyToken,

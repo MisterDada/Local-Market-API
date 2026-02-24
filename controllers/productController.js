@@ -6,10 +6,8 @@ import { uploadImage, deleteImage } from "../services/cloudinaryService.js";
 import { generateSearchKeywords, expandSearchQuery } from "../services/aiService.js";
 import { productResource } from "../resources/productResource.js";
 
-// ─── Semantic Search ───────────────────────────────────────
-/**
- * GET /api/products/search?query=...&limit=...
- */
+// Semantic Search 
+
 export const semanticSearch = asyncHandler(async (req, res) => {
   const { query, limit = 10 } = req.query;
 
@@ -53,19 +51,13 @@ export const semanticSearch = asyncHandler(async (req, res) => {
   return res.json(productResource(sortedResults));
 });
 
-// ─── Get All Products ──────────────────────────────────────
-/**
- * GET /api/products/allProducts
- */
+//  Get All Products 
 export const allProducts = asyncHandler(async (req, res) => {
   const products = await ProductsSchema.find().select("-__v");
   return successResponse(res, products);
 });
 
-// ─── Get Product By ID ─────────────────────────────────────
-/**
- * GET /api/products/getByID/:id
- */
+// Get Product By ID 
 export const getProductById = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -80,10 +72,7 @@ export const getProductById = asyncHandler(async (req, res) => {
   return successResponse(res, product);
 });
 
-// ─── Create Product ────────────────────────────────────────
-/**
- * POST /api/products/createProduct
- */
+// Create Product 
 export const createProduct = asyncHandler(async (req, res) => {
   const { name, description, price, category, tags } = req.body;
 
@@ -112,7 +101,7 @@ export const createProduct = asyncHandler(async (req, res) => {
     201
   );
 
-  // Fire-and-forget background processing
+  // background processing
   processProductInBackground(product._id, req.file.buffer, name, description, category);
 });
 
@@ -173,10 +162,7 @@ const processProductInBackground = async (productId, imageBuffer, name, descript
   }
 };
 
-// ─── Delete Product ────────────────────────────────────────
-/**
- * DELETE /api/products/deleteProduct/:id
- */
+// ─── Delete Product 
 export const deleteProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
@@ -193,10 +179,7 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   return successResponse(res, deletedProduct, "Product deleted successfully");
 });
 
-// ─── Update Product ────────────────────────────────────────
-/**
- * PATCH /api/products/updateProduct/:id
- */
+// ─── Update Product 
 export const updateProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const updates = req.body;

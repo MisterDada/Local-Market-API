@@ -1,7 +1,3 @@
-/**
- * Role-based access control middleware.
- * Usage: onlyAllow("Seller") or onlyAllow("Seller", "Admin")
- */
 const onlyAllow = (...allowedRoles) => {
   return (req, res, next) => {
     if (!req.user) {

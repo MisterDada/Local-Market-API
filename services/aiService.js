@@ -3,13 +3,6 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 const MODEL_NAME = "gemini-2.5-flash";
 
-/**
- * Generate search keywords for a product using Gemini AI.
- * @param {string} name - Product name
- * @param {string} description - Product description
- * @param {string} category - Product category
- * @returns {Promise<string[]>} Array of keyword strings
- */
 export const generateSearchKeywords = async (name, description, category) => {
     const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
@@ -28,11 +21,7 @@ export const generateSearchKeywords = async (name, description, category) => {
         .filter(Boolean);
 };
 
-/**
- * Expand a user's search query into related terms using Gemini AI.
- * @param {string} query - Original search query
- * @returns {Promise<string[]>} Array of expanded search terms
- */
+
 export const expandSearchQuery = async (query) => {
     const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
